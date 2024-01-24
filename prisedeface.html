@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.2/landmark_grid.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.css" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.2/control_utils_3d.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.4/pose.js" crossorigin="anonymous"></script>
+    <style>
+        @font-face {
+            font-family: "TT Fors Trial";
+            src: url("fonts/TT Fors Trial Light.ttf");
+            font-weight: 300;
+        }
+        @font-face {
+            font-family: "TT Fors Trial";
+            src: url("fonts/TT Fors Trial Variable.ttf");
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "SF Pro Text";
+            src: url("FontsFree-Net-SFProText-Semibold.ttf");
+            font-weight: 600;
+        }
+        body {
+            margin: 0;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 92px;
+            left: 28px;
+            width: 80px;
+            height: 80px;
+            z-index: 2;
+        }
+
+        .back-button button {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .back-button img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .speaker-icon {
+            position: absolute;
+            top: 100px;
+            left: 850px;
+            width: 65px;
+            height: 65px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .speaker-icon img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .group-496 {
+            position: absolute;
+            width: 38px;
+            height: 136px;
+            top: 140px;
+            left: 324px;
+        }
+
+        .rectangle-172 {
+            background: #eaeaea;
+            border-radius: 60px;
+            border: 4px solid #08293f;
+            width: 80px;
+            height: 320px;
+            position: absolute;
+            left: 510px;
+            top: 200px;
+            z-index: 2;
+        }
+
+        .ellipse-27,
+        .ellipse-29,
+        .ellipse-28 {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px ;
+            left: 523px;
+            z-index: 2;
+        }
+
+        .ellipse-27 {
+            background: rgba(217, 217, 217, 0.5);
+            border-style: dashed;
+            border-color: #08293f;
+            top: 336px;
+        }
+
+        .ellipse-29 {
+            background: rgba(217, 217, 217, 0.5);
+            border-style: solid;
+            border-color: rgba(8, 41, 63, 0.2);
+            top: 246px;
+        }
+
+        .ellipse-28 {
+            background: #f9781b;
+            border-style: solid;
+            border-color: #000000;
+            top: 416px;
+        }
+
+        .loading_message {
+            top: 50%;
+            left:20.5%;
+            background: rgba(15, 29, 38, 0.9);
+            border-radius: 24px;
+            width: 59.1%;
+            height: 15.8%;
+            position: relative;
+            color: white;
+            font-family: 'TT Fors Trial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        .loading-circle {
+            top: 15%;
+            left: 50%;
+            width: 64px;
+            height: 64px;
+            border: 6px solid #fff;
+            border-radius: 50%;
+            border-top: 3px solid #08293f;
+            animation: spin 1s linear infinite;
+            margin-bottom: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1, h2 , h5 {
+            left: 50%;
+            margin: 8px 0;
+            font-family: 'TT Fors Trial', sans-serif;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 400;
+        }
+
+        h5 {
+            font-size: 36px;
+            font-weight: 200;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: azure;
+            text-align: center;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="loading_message">
+    <div class="loading-circle"></div>
+    <h1>Juste un moment...</h1>
+    <h2>Nous allons prendre la photo</h2>
+</div>
+
+<div class="group-496">
+    <div class="rectangle-172"></div>
+    <div class="ellipse-27"></div>
+    <div class="ellipse-29"></div>
+    <div class="ellipse-28"></div>
+</div>
+
+
+<div class="back-button">
+    <button onclick="goBack()">
+        <img src="icons/majesticons_arrow-up.png" alt="Back" />
+    </button>
+</div>
+
+<div class="speaker-icon" onclick="toggleMute()">
+    <img id="speakerImage" src="images/volume.png" alt="Volume" />
+</div>
+
+<div class="container">
+    <video id="input_video" class="input_video"></video>
+    <canvas id="output_canvas" class="output_canvas"></canvas>
+    <div class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <div class="message">
+            Fitsize Pose Prise de Face
+        </div>
+    </div>
+</div>
+
+
+<div class="control-panel" style="display: none;">
+</div>
+<div class='square-box'>
+    <div class="landmark-grid-container" style="display: none;"></div>
+</div>
+
+<div id="validation" style="display: none;" >
+    <div class="scan-tape-11">
+
+        <div class="valframe-parent">
+            <div class="valframe">
+                <div class="vrifiez-les-contours">Vérifiez les contours de face</div>
+                <div class="a-doit-faire">ça doit faire le tour de votre corps</div>
+            </div>
+            <div class="valframe-group">
+                <button onclick="" >
+                    <div class="reprendre-wrapper">
+                        <div class="vrifiez-les-contours">Reprendre</div>
+                    </div>
+                </button>
+                <button onclick="" >
+                    <div class="valbouton-primaire">
+                        <div class="vrifiez-les-contours">Valider</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+    let phonePosition = "TiltedBottom"; // Default to "TiltedBottom"
+
+    function handleOrientation(event) {
+        let beta = event.beta;
+
+        if (beta < -45) {
+            phonePosition = "TiltedBottom";
+        } else if (beta > 45) {
+            phonePosition = "TiltedTop";
+        } else {
+            phonePosition = "WellPositioned";
+        }
+
+        updateCircleColors();
+
+        const loadingMessage = document.querySelector(".loading_message");
+        if (phonePosition === "WellPositioned") {
+            loadingMessage.style.display = "flex";
+        } else {
+            loadingMessage.style.display = "none";
+        }
+    }
+
+    async function requestDeviceOrientation() {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            // iOS 13+ devices
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission()
+                if (permissionState === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation)
+                } else {
+                    alert('Permission was denied')
+                }
+            } catch (error) {
+                alert(error)
+            }
+        } else if ('DeviceOrientationEvent' in window) {
+            // Non iOS 13+ devices
+            window.addEventListener('deviceorientation', handleOrientation)
+        } else {
+            // Not supported
+            alert('Not supported')
+        }
+    }
+
+    function updateCircleColors() {
+        const ellipse27 = document.querySelector(".ellipse-27");
+        const ellipse29 = document.querySelector(".ellipse-29");
+        const ellipse28 = document.querySelector(".ellipse-28");
+
+        ellipse27.style.backgroundColor = getCercleColor(1);
+        ellipse27.style.borderColor = getCercleBorderColor(1);
+
+        ellipse29.style.backgroundColor = getCercleColor(0);
+        ellipse29.style.borderColor = getCercleBorderColor(0);
+
+        ellipse28.style.backgroundColor = getCercleColor(2);
+        ellipse28.style.borderColor = getCercleBorderColor(2);
+    }
+
+    function getCercleColor(index) {
+        switch (phonePosition) {
+            case "WellPositioned":
+                return index === 1 ? "rgba(28, 228, 150, 1)" : "rgba(225, 225, 225, 0.5)";
+            case "TiltedTop":
+                return index === 0 ? "orange" : "rgba(225, 225, 225, 0.5)";
+            case "TiltedBottom":
+                return index === 2 ? "orange" : "rgba(225, 225, 225, 0.5)";
+        }
+    }
+
+    function getCercleBorderColor(index) {
+        switch (phonePosition) {
+            case "WellPositioned":
+                return index === 1 ? "rgba(8, 41, 63, 0.6)" : "rgba(182, 188, 193, 1)";
+            case "TiltedTop":
+                return index === 0 ? "rgba(204, 85, 0, 1)" : "rgba(182, 188, 193, 1)";
+            case "TiltedBottom":
+                return index === 2 ? "rgba(204, 85, 0, 1)" : "rgba(182, 188, 193, 1)";
+        }
+    }
+
+    requestDeviceOrientation();
+
+    let isMuted = false;
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        const speakerImage = document.getElementById('speakerImage');
+        speakerImage.src = isMuted ? 'images/no-sound.png' : 'images/volume.png';
+    }
+
+    function goBack() {
+        window.history.back();
+    }
+</script>
+</body>
+
+
+<footer >
+    <div id="guide" >
+        <div class="regardez-directement-lapparei-parent">
+            <div class="regardez-directement-lapparei" id="feedback">
+                <h5>Regardez directement l’appareil</h5>
+            </div>
+            <div class="position-de-face">
+               <h1>Position de face</h1>
+            </div>
+            <img class="frame-child" alt="" src="./public/line-109.svg" />
+        </div>
+    </div>
+</footer>
+
+</html>
+
+<script type="module" >
+    // Angle Calculations & Drawings Functions :
+    function drawCircle(canvasCtx, poseLandmarks, landmarkIds, options) {
+        const canvasWidth = canvasCtx.canvas.width;
+        const canvasHeight = canvasCtx.canvas.height;
+
+        landmarkIds.forEach(id => {
+            const landmark = poseLandmarks[id];
+            if (landmark && (!landmark.hasOwnProperty('visibility') || landmark.visibility >= options.visibilityMin)) {
+                const x = landmark.x * canvasWidth;
+                const y = landmark.y * canvasHeight;
+
+                canvasCtx.beginPath();
+                canvasCtx.arc(x, y, 4, 0, 2 * Math.PI, false);
+                canvasCtx.fillStyle = options.fillColor;
+                canvasCtx.fill();
+                canvasCtx.lineWidth = 3;
+                canvasCtx.strokeStyle = options.color;
+                canvasCtx.stroke();
+            }
+        });
+    }
+
+    function calculateAngle(A, B, C) {
+        const pt1X = A.x
+        const pt1Y = A.y
+        const pt2X = B.x
+        const pt2Y = B.y
+        const pt3X = C.x
+        const pt3Y = C.y
+
+        const BAx = pt1X - pt2X;
+        const BAy = pt1Y - pt2Y;
+        const BCx = pt3X - pt2X;
+        const BCy = pt3Y - pt2Y;
+
+        const dotProduct = BAx * BCx + BAy * BCy;
+        const magnitudeBA = Math.sqrt(BAx * BAx + BAy * BAy);
+        const magnitudeBC = Math.sqrt(BCx * BCx + BCy * BCy);
+
+        // Calculer l'angle en radians
+        const angleInRadians = Math.acos(dotProduct / (magnitudeBA * magnitudeBC));
+
+        // Convertir en degrés
+        const angleInDegrees = angleInRadians * (180 / Math.PI);
+
+        return angleInDegrees;
+    }
+    function capture(canvasCtx,Pose,results,drawingUtils) {
+        pose.reset();
+        results = null; // Destroy the results object
+        drawingUtils.reset(); // Restore any canvas context transformations
+        drawingUtils = null; // Destroy the drawingUtils object
+        Pose= null;
+        var canvas = document.getElementById("output_canvas");
+        var video = document.getElementById("input_video");
+        document.getElementById("guide").style.display = "none";
+        document.getElementById("validation").style.display = "block";
+        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        var video = document.getElementById("input_video");
+        video.pause();
+        var img = canvas.toDataURL("image/png");
+
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+        var container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.justifyContent = "center";
+        container.style.alignItems = "center";
+        container.style.height = "100vh";
+        container.style.backgroundImage = "url('" + img + "')";
+        container.style.backgroundSize = "contain";
+        container.style.backgroundRepeat = "no-repeat";
+        container.style.backgroundPosition = "center";
+
+        // Create the image element
+        var image = document.createElement("img");
+        image.src = img;
+        image.style.maxWidth = "100%";
+        image.style.maxHeight = "100%";
+
+        // Append the image to the container
+        container.appendChild(image);
+
+        // Replace the document body with the container
+
+
+        document.body.appendChild(container);
+
+    }
+
+    // GUI Body Functions :
+    function validleftarm(canvasCtx,mpPose,results,drawingUtils)
+    {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.LEFT_SHOULDER ,mpPose.POSE_LANDMARKS.LEFT_ELBOW ,mpPose.POSE_LANDMARKS.LEFT_WRIST ], { visibilityMin: 0.65, color: "#1CE496" ,fillColor: "#1CE496"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[10],mpPose.POSE_CONNECTIONS[11]], { visibilityMin: 0.65, color: "#1CE496" });
+    }
+    function unvalidleftarm(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.LEFT_SHOULDER ,mpPose.POSE_LANDMARKS.LEFT_ELBOW ,mpPose.POSE_LANDMARKS.LEFT_WRIST ], { visibilityMin: 0.65, color: "#FF3D00" ,fillColor: "#FF3D00"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[10],mpPose.POSE_CONNECTIONS[11]], { visibilityMin: 0.65, color: "#FF3D00" });
+        feedback.innerHTML = "Lever le bras Gauche";
+    }
+    function validrightarm(canvasCtx,mpPose,results,drawingUtils) {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.RIGHT_SHOULDER ,mpPose.POSE_LANDMARKS.RIGHT_ELBOW ,mpPose.POSE_LANDMARKS.RIGHT_WRIST], { visibilityMin: 0.65, color: "#1CE496",fillColor: "#1CE496" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[16],mpPose.POSE_CONNECTIONS[17]], { visibilityMin: 0.65, color: "#1CE496" });
+    }
+    function unvalidrightarm(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.RIGHT_SHOULDER ,mpPose.POSE_LANDMARKS.RIGHT_ELBOW ,mpPose.POSE_LANDMARKS.RIGHT_WRIST], { visibilityMin: 0.65, color: "#FF3D00",fillColor: "#FF3D00" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[16],mpPose.POSE_CONNECTIONS[17]], { visibilityMin: 0.65, color: "#FF3D00" });
+        feedback.innerHTML = "Lever le bras Droit";
+    }
+    function validarms(canvasCtx,mpPose,results,drawingUtils)
+    {       validrightarm(canvasCtx,mpPose,results,drawingUtils);
+        validleftarm(canvasCtx,mpPose,results,drawingUtils);
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[9]], { visibilityMin: 0.65, color: "#1CE496" });
+    }
+    function unvalidarms(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[9]], { visibilityMin: 0.65, color: "#FF3D00" });
+        feedback.innerHTML = "Lever et écarter les deux bras";
+    }
+    function validleftleg(canvasCtx,mpPose,results,drawingUtils)
+    {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.LEFT_HIP ,mpPose.POSE_LANDMARKS.LEFT_KNEE ,mpPose.POSE_LANDMARKS.LEFT_ANKLE ], { visibilityMin: 0.65, color: "#1CE496" ,fillColor: "#1CE496"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[25],mpPose.POSE_CONNECTIONS[27]], { visibilityMin: 0.65, color: "#1CE496" });
+    }
+    function unvalidleftleg(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.LEFT_HIP ,mpPose.POSE_LANDMARKS.LEFT_KNEE ,mpPose.POSE_LANDMARKS.LEFT_ANKLE ], { visibilityMin: 0.65, color: "#FF3D00",fillColor: "#FF3D00" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[25],mpPose.POSE_CONNECTIONS[27]], { visibilityMin: 0.65, color: "#FF3D00" });
+        feedback.innerHTML = "Ecarter la jambe Gauche";
+    }
+    function validrightleg(canvasCtx,mpPose,results,drawingUtils)
+    {
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.RIGHT_HIP ,mpPose.POSE_LANDMARKS.RIGHT_KNEE ,mpPose.POSE_LANDMARKS.RIGHT_ANKLE ], { visibilityMin: 0.65, color: "#1CE496" ,fillColor: "#1CE496"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[26],mpPose.POSE_CONNECTIONS[28]], { visibilityMin: 0.65, color: "#1CE496" });
+    }
+    function unvalidrightleg(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.RIGHT_HIP ,mpPose.POSE_LANDMARKS.RIGHT_KNEE ,mpPose.POSE_LANDMARKS.RIGHT_ANKLE ], { visibilityMin: 0.65, color: "#FF3D00" ,fillColor: "#FF3D00"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[26],mpPose.POSE_CONNECTIONS[28]], { visibilityMin: 0.65, color: "#FF3D00" });
+        feedback.innerHTML = "Ecarter la jambe Droite";
+    }
+    function validlegs(canvasCtx,mpPose,results,drawingUtils)
+    {   drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[24]], { visibilityMin: 0.65, color: "#1CE496" });
+        validrightleg(canvasCtx,mpPose,results,drawingUtils);
+        validleftleg(canvasCtx,mpPose,results,drawingUtils);
+    }
+    function unvalidlegs(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[24]], { visibilityMin: 0.65, color: "#FF3D00" });
+        feedback.innerHTML = "Ecarter les deux jambes";
+    }
+    function validbody(canvasCtx, mpPose, results, drawingUtils, feedback) {
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[12], mpPose.POSE_CONNECTIONS[13]], { visibilityMin: 0.65, color: "#1CE496" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[22], mpPose.POSE_CONNECTIONS[23]], { visibilityMin: 0.65, color: "#1CE496" });
+        validarms(canvasCtx, mpPose, results, drawingUtils);
+        validlegs(canvasCtx, mpPose, results, drawingUtils);
+        feedback.innerHTML = "Parfait ! Plus un geste!";
+        pose.reset();
+        drawingUtils = null; // Destroy the drawingUtils object
+        capture(canvasCtx, mpPose, results, drawingUtils);
+    }
+    function unvalidbody(canvasCtx,mpPose,results,drawingUtils)
+    {
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[22],mpPose.POSE_CONNECTIONS[23]], { visibilityMin: 0.65, color: "#FF3D00" });
+    }
+    function unvisiblebody(canvasCtx,mpPose,results,drawingUtils)
+    {   drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[9]], { visibilityMin: 0.65, color: "#FF3D00" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[24]], { visibilityMin: 0.65, color: "#FF3D00" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[22],mpPose.POSE_CONNECTIONS[23]], { visibilityMin: 0.65, color: "#FF3D00" });
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.LEFT_SHOULDER ,mpPose.POSE_LANDMARKS.LEFT_ELBOW ,mpPose.POSE_LANDMARKS.LEFT_WRIST ], { visibilityMin: 0.65, color: "#FF3D00" ,fillColor: "#FF3D00"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[10],mpPose.POSE_CONNECTIONS[11]], { visibilityMin: 0.65, color: "#FF3D00" });
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.RIGHT_SHOULDER ,mpPose.POSE_LANDMARKS.RIGHT_ELBOW ,mpPose.POSE_LANDMARKS.RIGHT_WRIST], { visibilityMin: 0.65, color: "#FF3D00",fillColor: "#FF3D00" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[16],mpPose.POSE_CONNECTIONS[17]], { visibilityMin: 0.65, color: "#FF3D00" });
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.RIGHT_HIP ,mpPose.POSE_LANDMARKS.RIGHT_KNEE ,mpPose.POSE_LANDMARKS.RIGHT_ANKLE ], { visibilityMin: 0.65, color: "#FF3D00" ,fillColor: "#FF3D00"});
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[26],mpPose.POSE_CONNECTIONS[28]], { visibilityMin: 0.65, color: "#FF3D00" });
+        drawCircle(canvasCtx, results.poseLandmarks, [mpPose.POSE_LANDMARKS.LEFT_HIP ,mpPose.POSE_LANDMARKS.LEFT_KNEE ,mpPose.POSE_LANDMARKS.LEFT_ANKLE ], { visibilityMin: 0.65, color: "#FF3D00",fillColor: "#FF3D00" });
+        drawingUtils.drawConnectors(canvasCtx, results.poseLandmarks, [mpPose.POSE_CONNECTIONS[25],mpPose.POSE_CONNECTIONS[27]], { visibilityMin: 0.65, color: "#FF3D00" });
+
+        feedback.innerHTML = "Votre corps doit être visible ! ";
+    }
+    function unvisiblerightarm(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        feedback.innerHTML = "Votre bras droit doit être visible !";
+    }
+    function unvisibleleftarm(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        feedback.innerHTML = "Votre bras gauche doit être visible !";
+    }
+    function unvisiblerightleg(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        feedback.innerHTML = "Votre jambe droite doit être visible !";
+    }
+    function unvisibleleftleg(canvasCtx,mpPose,results,drawingUtils,feedback)
+    {
+        feedback.innerHTML = "Votre jambe gauche doit être visible !";
+    }
+
+    const controls = window;
+    const LandmarkGrid = window.LandmarkGrid;
+    const drawingUtils = window;
+    const mpPose = window;
+    const options = {
+        locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@${mpPose.VERSION}/${file}`;
+        }
+    };
+
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const controlsElement = document.getElementsByClassName('control-panel')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+
+    const fpsControl = new controls.FPS();
+    const spinner = document.querySelector('.loading');
+    spinner.ontransitionend = () => {
+        spinner.style.display = 'none';
+    };
+    const landmarkContainer = document.getElementsByClassName('landmark-grid-container')[0];
+    const grid = new LandmarkGrid(landmarkContainer, {
+        connectionColor: 0xCCCCCC,
+        definedColors: [{ name: 'LEFT', value: 0xffa500 }, { name: 'RIGHT', value: 0x00ffff }],
+        range: 2,
+        fitToGrid: true,
+        labelSuffix: 'm',
+        landmarkSize: 2,
+        numCellsPerAxis: 4,
+        showHidden: false,
+        centered: true,
+    });
+    let activeEffect = 'mask';
+
+    function onResults(results) {
+        document.body.classList.add('loaded');
+        let angleRightArm = 0;
+        let angleLeftArm = 0;
+        let angleLeftLeg = 0;
+        let angleRightLeg = 0;
+        let angleLeftWrist = 0;
+        let angleRightWrist = 0;
+        let angleLeftAnkle = 0;
+        let angleRightAnkle = 0;
+
+        let okLeftArm = false;
+        let okRightArm = false;
+        let okLeftLeg = false;
+        let okRightLeg = false;
+        let okLeftWrist = false;
+        let okRightWrist = false;
+        let okLeftAnkle = false;
+        let okRightAnkle = false;
+
+        let visibleleftleg = false;
+        let visiblerightleg = false;
+        let visibleleftarm = false;
+        let visiblerightarm = false;
+        let visiblebody = false;
+
+        fpsControl.tick();
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        if (results.segmentationMask) {
+            canvasCtx.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
+            if (activeEffect === 'mask' || activeEffect === 'both') {
+                canvasCtx.globalCompositeOperation = 'source-in';
+                canvasCtx.fillStyle = '#00FF007F';
+                canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+            } else {
+                canvasCtx.globalCompositeOperation = 'source-out';
+                canvasCtx.fillStyle = '#0000FF7F';
+                canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+            }
+            canvasCtx.globalCompositeOperation = 'destination-atop';
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.globalCompositeOperation = 'source-over';
+        } else {
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);}
+
+        //Fonctionnalité de Détection de la posture :
+        if (results.poseLandmarks) {
+            const A = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_SHOULDER];
+            const B = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_SHOULDER];
+            const C = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_ELBOW];
+            const D = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_ELBOW];
+            const E = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_WRIST];
+            const F = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_WRIST];
+            const AL = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_HIP];
+            const BL = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_HIP];
+            const CL = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_KNEE];
+            const DL = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_KNEE];
+            const EL = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_ANKLE];
+            const FL = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_ANKLE];
+            const G = results.poseLandmarks[mpPose.POSE_LANDMARKS.RIGHT_HEEL];
+            const H = results.poseLandmarks[mpPose.POSE_LANDMARKS.LEFT_HEEL];
+
+            //Calculs des Angles et tests de visibilité :
+            if (A && B && C && D && E && F && AL && BL && CL && DL && EL && FL) {
+                visibleleftleg=(AL.visibility > 0.9 && BL.visibility > 0.9 && CL.visibility > 0.9 && DL.visibility > 0.9 && EL.visibility > 0.9 && FL.visibility > 0.9 && G.visibility > 0.5 && H.visibility > 0.5);
+                visiblerightleg=( AL.visibility > 0.9 && BL.visibility > 0.9 && CL.visibility > 0.9 && DL.visibility > 0.9 && EL.visibility > 0.9 && FL.visibility > 0.9 && G.visibility > 0.5 && H.visibility > 0.5);
+                visibleleftarm=(A.visibility > 0.9 && B.visibility > 0.9 && C.visibility > 0.9 && D.visibility > 0.9 && E.visibility > 0.9 && F.visibility > 0.9);
+                visiblerightarm=( A.visibility > 0.9 && B.visibility > 0.9 && C.visibility > 0.9 && D.visibility > 0.9 && E.visibility > 0.9 && F.visibility > 0.9);
+                visiblebody= visibleleftarm && visiblerightarm && visibleleftleg && visiblerightleg;
+
+                // Hand is a straight line
+                angleLeftWrist=calculateAngle(C, B, E)-90
+                if (Math.abs(angleLeftWrist) > 80 &&Math.abs(angleLeftWrist) < 95 && visibleleftarm) { okLeftWrist = true;}
+                angleRightWrist=calculateAngle(D, A, F)-90
+                if (Math.abs(angleRightWrist) > 80 && Math.abs(angleRightWrist) < 95 && visiblerightarm) { okRightWrist = true;}
+
+                // Arms form an A Shape
+                angleLeftArm=calculateAngle(B, A, C)-90
+                if (angleLeftArm > 14.5 && visibleleftarm && okLeftWrist) { okLeftArm = true;}
+                angleRightArm=calculateAngle(A, B, D)-90
+                if (angleRightArm > 9 && visiblerightarm && okRightWrist) { okRightArm = true;}
+
+                //Legs in a straight line
+                angleLeftAnkle=calculateAngle(EL, FL, CL)-90;
+                if (Math.abs(angleLeftAnkle) > 80 && visibleleftleg) { okLeftAnkle = true;}
+                angleRightAnkle=calculateAngle(FL, EL, DL)-90;
+                if (Math.abs(angleRightAnkle) > 80 && visiblerightleg) { okRightAnkle = true;}
+
+                //Legs form a V Shape
+                angleLeftLeg=calculateAngle(DL, BL, CL)-90;
+                if (Math.abs(angleLeftLeg) > 55 &&visibleleftleg  ) { okLeftLeg = true;}
+                angleRightLeg=calculateAngle(CL, AL, DL)-90;
+                if (Math.abs(angleRightLeg) > 55 && visiblerightleg ) { okRightLeg = true;}
+
+
+            }
+        } canvasCtx.restore();
+
+
+        // Feedback utilisateur :
+        if (results.poseWorldLandmarks) {
+            var feedback = document.getElementById("feedback");
+            feedback.innerHTML = "Regardez directement l'appareil photo ! ";
+
+            if (visiblebody) {
+
+                if (okRightArm && okLeftArm && okRightLeg && okLeftLeg) {
+                    validbody(canvasCtx,mpPose,results,drawingUtils,feedback);
+                } else {
+                    unvalidbody(canvasCtx,mpPose,results,drawingUtils);
+                    if (okRightArm && okLeftArm) {
+                        validarms(canvasCtx,mpPose,results,drawingUtils);
+                    } else {
+                        unvalidarms(canvasCtx,mpPose,results,drawingUtils,feedback);
+                        if(okRightArm){
+                            validrightarm(canvasCtx,mpPose,results,drawingUtils);
+                        }
+                        else{
+                            unvalidrightarm(canvasCtx,mpPose,results,drawingUtils,feedback);
+                        }
+                        if(okLeftArm){
+                            validleftarm(canvasCtx,mpPose,results,drawingUtils);
+                        }
+                        else{
+                            unvalidleftarm(canvasCtx,mpPose,results,drawingUtils,feedback);
+                        }
+                    }
+                    if (okRightLeg && okLeftLeg) {
+                        validlegs(canvasCtx,mpPose,results,drawingUtils);
+                    } else {
+                        unvalidlegs(canvasCtx,mpPose,results,drawingUtils,feedback);
+                        if(okRightLeg){
+                            validrightleg(canvasCtx,mpPose,results,drawingUtils);
+                        }
+                        else{
+                            unvalidrightleg(canvasCtx,mpPose,results,drawingUtils,feedback);
+                        }
+                        if(okLeftLeg){
+                            validleftleg(canvasCtx,mpPose,results,drawingUtils);
+                        }
+                        else{
+                            unvalidleftleg(canvasCtx,mpPose,results,drawingUtils,feedback);
+                        }
+                    }
+                }}
+            else{
+                unvisiblebody(canvasCtx,mpPose,results,drawingUtils);
+                if(!visibleleftarm){
+                    unvisibleleftarm(canvasCtx,mpPose,results,drawingUtils,feedback);
+                }
+                if(!visiblerightarm){
+                    unvisiblerightarm(canvasCtx,mpPose,results,drawingUtils,feedback);
+                }
+                if(!visibleleftleg){
+                    unvisibleleftleg(canvasCtx,mpPose,results,drawingUtils,feedback);
+                }
+                if(!visiblerightleg){
+                    unvisiblerightleg(canvasCtx,mpPose,results,drawingUtils,feedback);
+                }
+
+            }} else {
+            grid.updateLandmarks([]);
+        }
+    }
+
+    // Grille documentation :
+    const pose = new mpPose.Pose(options);
+    pose.onResults(onResults);
+    new controls
+        .ControlPanel(controlsElement, {
+            selfieMode: true,
+            modelComplexity: 1,
+            smoothLandmarks: false,
+            enableSegmentation: false,
+            smoothSegmentation: false,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5,
+            effect: 'background',
+        })
+        .add([
+            new controls.StaticText({ title: 'MediaPipe Pose' }),
+            fpsControl,
+            new controls.Toggle({ title: 'Selfie Mode', field: 'selfieMode' }),
+            new controls.SourcePicker({
+                onSourceChanged: () => {
+                    pose.reset();
+                },
+                onFrame: async (input, size) => {
+                    const aspect = size.height / size.width;
+                    let width, height;
+                    if (window.innerWidth > window.innerHeight) {
+                        height = window.innerHeight;
+                        width = height / aspect;
+                    } else {
+                        width = window.innerWidth;
+                        height = width * aspect;
+                    }
+                    canvasElement.width = width;
+                    canvasElement.height = height;
+                    await pose.send({ image: input });
+                },
+            }),
+            new controls.Slider({
+                title: 'Model Complexity',
+                field: 'modelComplexity',
+                discrete: ['Lite', 'Full', 'Heavy'],
+            }),
+            new controls.Slider({
+                title: 'Min Detection Confidence',
+                field: 'minDetectionConfidence',
+                range: [0, 1],
+                step: 0.01
+            }),
+            new controls.Slider({
+                title: 'Min Tracking Confidence',
+                field: 'minTrackingConfidence',
+                range: [0, 1],
+                step: 0.01
+            }),
+            new controls.Slider({
+                title: 'Effect',
+                field: 'effect',
+                discrete: { 'background': 'Background', 'mask': 'Foreground' },
+            }),
+
+        ])
+        .on(x => {
+            const options = x;
+            videoElement.classList.toggle('selfie', options.selfieMode);
+            activeEffect = x['effect'];
+            pose.setOptions(options);
+        });
+
+
+</script>
+<style>
+
+    :root {
+        /* fonts */
+        --h3: "TT Fors Trial";
+        --font-sf-pro-text: "SF Pro Text";
+
+        /* font sizes */
+        --h3-size: 16px;
+        --font-size-lg: 18px;
+        --font-size-sm: 14px;
+
+        /* Colors */
+        --color-white: #fff;
+        --color-darkslategray: #08293f;
+        --color-gray: #fafafc;
+        --color-black: #000;
+        --color-gainsboro: #dadfe3;
+        --color-mediumslateblue: #4b56db;
+
+        /* Paddings */
+        --padding-4xl: 23px;
+        --padding-base: 16px;
+
+        /* Border radiuses */
+        --br-3xl: 22px;
+        --br-5xs: 8px;
+    }
+
+    .regardez-directement-lapparei-parent {
+        position: absolute;
+        top: 90%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 24px;
+        background-color: #08293f;
+        width: 85%;
+        height: 284px;
+        overflow: revert;
+        display: flex;
+    }
+    .regardez-directement-lapparei {
+        font-size: 36px;
+        font-weight: 200;
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: azure;
+        text-align: center;
+        white-space: nowrap;
+        display: flex;
+
+    }
+    .regardez-directement-lappareil {
+        position: absolute;
+        top: 70%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: var(--h3-size);
+        display: flex;
+        color: azure;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .position-de-face {
+        position: absolute;
+        top: 25%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--color-white);
+    }
+    .frame-child {
+        position: absolute;
+        top: 38%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-height: 100%;
+        width: 20%;
+    }
+
+    .scan-tape-10-inner {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 38px;
+        height: 136px;
+    }
+
+    footer {
+        z-index: 9999;
+        /* Overlay the top one */
+        top: auto;
+    }
+
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    .abs {
+        position: absolute;
+    }
+
+    body {
+        bottom: 0;
+        font-family: "Titillium Web", sans-serif;
+        color: white;
+        left: 0;
+        margin: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transform-origin: 0px 0px;
+        overflow: hidden;
+    }
+
+    .container {
+        position: absolute;
+        background-color: #e0ff5800;
+        width: 100%;
+        max-height: 100%;
+    }
+
+    .input_video {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+    .input_video.selfie {
+        transform: scale(-1, 1);
+    }
+
+    .input_image {
+        position: absolute;
+    }
+
+    .canvas-container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .output_canvas {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        /* position: relative; */
+        left: 0;
+        top: 0;
+    }
+
+    .loading {
+        display: flex;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        align-items: center;
+        backface-visibility: hidden;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 1s;
+    }
+    .loading .message {
+        font-size: x-large;
+        color: #0c0101;
+    }
+    .loading .spinner {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        animation: spin 1s linear infinite;
+        border: 32px solid #bebebe00;
+        border-top: 32px solid #a1db34;
+        border-radius: 50%;
+    }
+
+    .loaded .loading {
+        opacity: 0;
+    }
+
+    .shoutout {
+        left: 0;
+        right: 0;
+        bottom: 40px;
+        text-align: center;
+        font-size: 24px;
+        position: absolute;
+    }
+
+    :root {
+        /* fonts */
+        --h3: "TT Fors Trial";
+        --font-sf-pro-text: "SF Pro Text";
+
+        /* font sizes */
+        --h3-size: 16px;
+
+        /* Colors */
+        --color-white: #fff;
+        --color-gray: #fafafc;
+    }
+
+    .scan-tape-11 {
+        position: absolute;
+        background-color: transparent;
+        width: 100%;
+        bottom : -1%;
+        height: 844px;
+        overflow: hidden;
+        text-align: center;
+        font-size: var(--h3-size);
+        color: var(--color-gray);
+        font-family: var(--h3);
+    }
+    .a-doit-faire,
+    .vrifiez-les-contours {
+        position: relative;
+    }
+    .a-doit-faire {
+        font-size: var(--font-size-lg);
+        font-weight: 300;
+        display: inline-block;
+        width: 80%;
+    }
+    .valbouton-primaire,
+    .valframe,
+    .reprendre-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .valframe {
+        width: 100%;
+        height: 56px;
+        overflow: hidden;
+        flex-shrink: 0;
+        flex-direction: column;
+        gap: 9px;
+    }
+    .valbouton-primaire,
+    .reprendre-wrapper {
+        border-radius: var(--br-5xs);
+        flex-direction: row;
+        box-sizing: border-box;
+    }
+    .reprendre-wrapper {
+        background-color: var(--color-gray);
+        border: 1px solid var(--color-mediumslateblue);
+        width: 163px;
+        height: 52px;
+        padding: var(--padding-base) var(--padding-base) var(--padding-base) 24px;
+    }
+    .valbouton-primaire {
+        background-color: var(--color-mediumslateblue);
+        width: 172px;
+        height: 50px;
+        padding: 10px;
+        color: var(--color-white);
+    }
+    .valframe-group,
+    .valframe-parent {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    .valframe-group {
+        width: 343px;
+        height: 50px;
+        flex-direction: row;
+        gap: 10px;
+        text-align: left;
+        color: var(--color-mediumslateblue);
+    }
+    .valframe-parent {
+        position: absolute;
+        top: 87%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: var(--br-3xl) var(--br-3xl) 0 0;
+        background-color: var(--color-white);
+        box-shadow: -1px -1px 10px rgba(0, 0, 0, 0.25);
+        width: 100%;
+        height: 177px;
+        flex-direction: column;
+        padding: var(--padding-4xl) 25px var(--padding-4xl) 22px;
+        box-sizing: border-box;
+        gap: 20px;
+        color: var(--color-darkslategray);
+    }
+
+    button {
+        border: none;
+        outline: none;
+        background: none;
+    }
+    button:focus {
+        outline: none;
+    }
+    button:active {
+        outline: none;
+    }
+    button:hover {
+        outline: none;
+        cursor: pointer;
+    }
+    .valbouton-primaire:hover {
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+
+
+
+</style>

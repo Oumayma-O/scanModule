@@ -1,0 +1,90 @@
+
+:root {
+    /* fonts */
+    --h3: "TT Fors Trial";
+    --font-sf-pro-text: "SF Pro Text";
+  
+    /* font sizes */
+    --h3-size: 16px;
+    --font-size-lg: 18px;
+    --font-size-sm: 14px;
+  
+    /* Colors */
+    --color-white: #fff;
+    --color-darkslategray: #08293f;
+    --color-gray: #fafafc;
+    --color-black: #000;
+    --color-gainsboro: #dadfe3;
+    --color-mediumslateblue: #4b56db;
+  
+    /* Paddings */
+    --padding-4xl: 23px;
+    --padding-base: 16px;
+  
+    /* Border radiuses */
+    --br-3xl: 22px;
+    --br-5xs: 8px;
+  }
+  
+.regardez-directement-lapparei-parent {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 12px;
+    background-color: #08293f;
+    width: 85%;
+    height: 142px;
+    font-size: 20px;
+    display: flex;
+  }
+  .regardez-directement-lapparei {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: var(--h3-size);
+    display: flex;
+    color: azure;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .regardez-directement-lappareil {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: var(--h3-size);
+    display: flex;
+    color: azure;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .position-de-face {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 19px;
+    color: var(--color-white);
+  }
+  .frame-child {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 100%;
+    width: 20%;
+  }
+  
+  .scan-tape-10-inner {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 38px;
+    height: 136px;
+  }
+  
+  
+  
